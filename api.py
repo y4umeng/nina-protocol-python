@@ -9,8 +9,7 @@ def print_error(error, call):
 def get_all_accounts():
     response = requests.get(f'{endpoint}/accounts')
     if response.status_code != 200: print_error(response, "get_all_accounts") 
-    # TODO
-    return [], response.json()["total"]
+    return [acc["publicKey"] for acc in response.json()["accounts"]], response.json()["total"]
     
 def get_account_by_public_key(publicKey):
     response = requests.get(f'{endpoint}/accounts/{publicKey}')
@@ -85,33 +84,48 @@ def get_post_by_public_key(publicKey):
 
 def get_all_releases():
     response = requests.get(f'{endpoint}/releases')
-    if response.status_code != 200: print_error(response, "get_all_releases")
+    if response.status_code != 200: 
+        print_error(response, "get_all_releases")
+        return
     return [Release(release) for release in response.json()["releases"]], response.json()["total"]
 
 def get_release_by_public_key(publicKey):
     response = requests.get(f'{endpoint}/releases/{publicKey}')
-    if response.status_code != 200: print_error(response, "get_release_by_public_key")  
+    if response.status_code != 200: 
+        print_error(response, "get_release_by_public_key")  
+        return
     return Release(response.json()["release"])
 
 def get_collectors_by_public_key(publicKey):
     response = requests.get(f'{endpoint}/releases/{publicKey}/collectors')
-    if response.status_code != 200: print_error(response, "get_collectors_by_public_key") 
+    if response.status_code != 200: 
+        print_error(response, "get_collectors_by_public_key") 
+        return
     return [collector for collector in response.json()["collectors"]]
 
 def get_hubs_by_public_key(publicKey):
     response = requests.get(f'{endpoint}/releases/{publicKey}/hubs')
-    if response.status_code != 200: print_error(response, "get_hubs_by_public_key") 
+    if response.status_code != 200: 
+        print_error(response, "get_hubs_by_public_key") 
+        return
     return [Hub(hub) for hub in response.json()["hubs"]]
 
 def get_exchanges_by_public_key(publicKey):
     response = requests.get(f'{endpoint}/releases/{publicKey}/exchanges')
-    if response.status_code != 200: print_error(response, "get_exchanges_by_public_key") 
+    if response.status_code != 200: 
+        print_error(response, "get_exchanges_by_public_key") 
+        return
     return [Exchange(exchange) for exchange in response.json()["exchanges"]]
 
 def search(query):
-    # untested
-    response = requests.post(f'{endpoint}/search', json=query)
-    if response.status_code != 200: print_error(response, "search")
-    return response
+    response = requests.post(f'{endpoint}/search', json={"query": query})
+    if response.status_code != 200: 
+        print_error(response, "search")
+        return
+    dict = {}
+    dict["accounts"] = [acc["account"] for acc in response.json()["accounts"]]
+    dict["releases"] = [release["publicKey"] for release in response.json()["releases"]]
+    dict["hubs"] = [hub["publicKey"] for hub in response.json()["hubs"]]
+    dict["artists"] = [artist["account"]["publicKey"] for artist in response.json()["artists"]]
+    return dict
 
-print(get_hub_by_public_key_or_handle("7Pc1WR8Rxt9UAgphNUA4jd8TXRFWuQhHyAG4jEhzbFkY").hub.public_key)

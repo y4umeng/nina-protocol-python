@@ -7,9 +7,9 @@ class Account:
     posts: list         # Posts this Account has made
     revenue_shares: list    # Releases that this Account has a revenueShare on
 
-    def __init__(self, json_data, publicKey):
+    def __init__(self, json_data, publicKey=None):
         self.public_key = publicKey
-        self.published = [Release(release) for release in json_data["published"]]
+        self.published = [Release(release) for release in json_data["published"]] 
         self.collected = [Release(release) for release in json_data["collected"]]
         self.exchanges = [Exchange(exchange) for exchange in json_data["exchanges"]]
         self.hubs = [Hub(hub) for hub in json_data["hubs"]]
